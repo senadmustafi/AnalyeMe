@@ -70,7 +70,7 @@ app.post('/users', async (req, res) => {
 
 app.post('/dir', async (req, res) => {
   let domain = req.body;
-  var array = fs.readFileSync('assets/test.txt', 'utf8').replace(/\r\n/g,'\n').split('\n');
+  var array = fs.readFileSync('assets/dir.txt', 'utf8').replace(/\r\n/g,'\n').split('\n');
 
 class MyEmitter extends EventEmitter {}
 const myEmitter = new MyEmitter();
@@ -90,9 +90,10 @@ array.forEach((item, index) => {
           }
       } catch (error) {
           console.error(`Error Occured: ${error}`);
+          console.log(domain.dns);
 
       }
-  }, 1000 * index);
+  }, 500 * index);
 });
 
 myEmitter.on("data", (status, item) => {
@@ -147,7 +148,7 @@ app.get('/my-ip', async (req, res) => {
   try {
     var ip = require('what-is-my-ip-address');
     const my_ip = await ip.v4(ip);
-    return res.json(my_ip)
+    return res.json({ip:my_ip})
 
 
   }

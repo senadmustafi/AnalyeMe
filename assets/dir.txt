@@ -1,6 +1,7 @@
 index
 images
 download
+robots.txt
 2006
 news
 crack
