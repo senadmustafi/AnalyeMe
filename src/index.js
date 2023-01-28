@@ -74,7 +74,7 @@ app.post('/dir', async (req, res) => {
 
 class MyEmitter extends EventEmitter {}
 const myEmitter = new MyEmitter();
-
+ 
 res.writeHead(200, {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*",
@@ -97,8 +97,8 @@ array.forEach((item, index) => {
 });
 
 myEmitter.on("data", (status, item) => {
-  //res.write(JSON.stringify({ item, status }));
-  console.log(JSON.stringify({ item, status }));
+  res.write(JSON.stringify({ item, status }));
+  //console.log(JSON.stringify({ item, status }));
 });
 });
 
@@ -148,7 +148,9 @@ app.get('/my-ip', async (req, res) => {
   try {
     var ip = require('what-is-my-ip-address');
     const my_ip = await ip.v4(ip);
+    console.log(req.headers);
     return res.json({ip:my_ip})
+
 
 
   }
