@@ -147,8 +147,7 @@ app.post('/openports', async (req, res) => {
 app.get('/my-ip', async (req, res) => {
   try {
     var ip = require('what-is-my-ip-address');
-    const my_ip = await ip.v4(ip);
-    console.log(req.headers);
+    const my_ip = req.headers["x-forwarded-for"] || await ip.v4(ip);
     return res.json({ip:my_ip})
 
 
