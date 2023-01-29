@@ -66,6 +66,29 @@ app.post('/users', async (req, res) => {
 
 })
 
+
+
+
+app.post('/scan-wp-users', async (req, res) => {
+  try{
+  let domain = req.body;
+  const ourdata = await axios.get(domain.domain + "wp-json/wp/v2/users" );
+  const filtererddata = ourdata.data;
+  let lista = []
+  filtererddata.forEach(author => {
+    lista.push(author.name); 
+})
+
+res.json(lista);
+  }
+  catch(e){
+    return res.json("Data is not available on this wp site")
+  }
+
+})
+
+
+
 //dir
 
 app.post('/dir', async (req, res) => {
@@ -122,7 +145,7 @@ app.get('/history/webstatus', [auth.verify], async (req, res) => {
 
 
 //Search for open Port
-app.post('/openports', async (req, res) => {
+app.post('/openport', async (req, res) => {
   let ipData = req.body;
   let ip = JSON.stringify(ipData.ip).replace(/[\"\\]/g, "");
   let port = parseInt(ipData.ports)
@@ -196,7 +219,7 @@ app.post('/webtech', async (req, res) => {
       headers: {},
       maxDepth: 3,
       maxUrls: 10,
-      maxWait: 7000,
+      maxWait: 14000,
       recursive: true,
       probe: true,
       userAgent: 'Wappalyzer',
