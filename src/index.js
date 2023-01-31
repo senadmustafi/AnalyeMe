@@ -11,7 +11,7 @@ import axios from 'axios';
 import dns  from 'dns';
 import fs from 'fs';
 import EventEmitter from "events";
-const cors = require('cors');
+
 
 
 const app = express()
