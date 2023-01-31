@@ -11,12 +11,16 @@ import axios from 'axios';
 import dns  from 'dns';
 import fs from 'fs';
 import EventEmitter from "events";
+import cors from "cors";
 
 
 const app = express()
 const port = 3000
 
 app.use(bodyParser.json())
+app.use(cors())
+
+
 
 
 
@@ -68,7 +72,7 @@ app.post('/users', async (req, res) => {
 
 
 
-
+//Scan wordPress admins
 app.post('/scan-wp-users', async (req, res) => {
   try{
   let domain = req.body;
