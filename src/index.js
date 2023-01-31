@@ -11,13 +11,14 @@ import axios from 'axios';
 import dns  from 'dns';
 import fs from 'fs';
 import EventEmitter from "events";
-
+import cors from "cors";
 
 
 const app = express()
 const port = 3000
-
+app.use(cors())
 app.use(bodyParser.json())
+
 
 
 app.get('/', (req, res) => {
