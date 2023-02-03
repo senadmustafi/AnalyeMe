@@ -22,7 +22,7 @@ app.use(bodyParser.json())
 
 
 app.get('/', (req, res) => {
-  res.send("heellooo")
+  res.send("Site is under construction")
 
 })
 
@@ -113,16 +113,15 @@ array.forEach((item, index) => {
 
           }
       } catch (error) {
-          console.error(`Error Occured: ${error}`);
-          console.log(domain.dns);
+          console.error(`Error Occured: ${error}`, item);
 
       }
   }, 500 * index);
 });
 
 myEmitter.on("data", (status, item) => {
-  res.write(JSON.stringify({ item, status }));
-  //console.log(JSON.stringify({ item, status }));
+  //res.write(JSON.stringify({ item, status }));
+  console.log(JSON.stringify({ item, status }));
 });
 });
 
@@ -171,7 +170,7 @@ app.post('/openport', async (req, res) => {
 app.get('/my-ip', async (req, res) => {
   try {
     var ip = require('what-is-my-ip-address');
-    const my_ip = req.headers["x-forwarded-for"] || await ip.v4(ip);
+    const my_ip = req.headers["x-forwarded-for"];
     return res.json({ip:my_ip})
 
 
