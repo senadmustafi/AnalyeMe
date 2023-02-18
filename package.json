@@ -22,6 +22,7 @@
     "mongodb": "^4.13.0",
     "node-port-scanner": "^3.0.1",
     "nodejs-traceroute": "^2.0.1",
+    "socket.io": "^4.6.0",
     "wappalyzer": "^6.10.54",
     "what-is-my-ip-address": "^1.0.3"
   },

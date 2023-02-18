@@ -10,16 +10,17 @@ import Wappalyzer from 'wappalyzer';
 import axios from 'axios';
 import dns  from 'dns';
 import fs from 'fs';
-import EventEmitter from "events";
 import cors from "cors";
-
+import http from "http";
+import socketIO from "socket.io";
 
 const app = express()
 const port = 3000
 app.use(cors())
 app.use(bodyParser.json())
 
-
+const server = http.createServer(app);
+const io = socketIO(server);
 
 app.get('/', (req, res) => {
   res.send("Site is under construction")
@@ -73,11 +74,11 @@ app.post('/users', async (req, res) => {
 app.post('/scan-wp-users', async (req, res) => {
   try{
   let domain = req.body;
-  const ourdata = await axios.get(domain.domain + "wp-json/wp/v2/users" );
+  const ourdata = await axios.get(domain.domain + "/wp-json/wp/v2/users" );
   const filtererddata = ourdata.data;
   let lista = []
   filtererddata.forEach(author => {
-    lista.push(author.name); 
+    lista.push(author.slug); 
 })
 
 res.json(lista);
@@ -88,6 +89,26 @@ res.json(lista);
 
 })
 
+app.post('/subdomain', async (req, res) => {
+  try{
+    var  {mydomain}  = req.body
+   const ourdata = await axios.get(`https://crt.sh/?q=${mydomain}&output=json`);
+    const filtererddata = ourdata.data;
+  let lista = []
+  filtererddata.forEach(subdomain => {
+    if(lista.includes(subdomain.common_name)){
+    }else{
+    lista.push(subdomain.common_name);
+  } 
+})
+
+res.json(lista);
+  }
+  catch(e){
+    return res.json("Subdomain not found")
+  }
+
+})
 
 
 //dir
@@ -96,9 +117,6 @@ app.post('/dir', async (req, res) => {
   let domain = req.body;
   var array = fs.readFileSync('assets/dir.txt', 'utf8').replace(/\r\n/g,'\n').split('\n');
 
-class MyEmitter extends EventEmitter {}
-const myEmitter = new MyEmitter();
- 
 res.writeHead(200, {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*",
@@ -109,19 +127,19 @@ array.forEach((item, index) => {
       try {
           const { status } = await axios.get(domain.dns+"/"+item);
           if (status === 200) {
-              myEmitter.emit("data", status, item);
+              io.emit("data", { item, status });
 
           }
       } catch (error) {
           console.error(`Error Occured: ${error}`, item);
+          io.emit(`Error Occured: ${error}`, item);
 
       }
   }, 500 * index);
 });
 
-myEmitter.on("data", (status, item) => {
-  //res.write(JSON.stringify({ item, status }));
-  console.log(JSON.stringify({ item, status }));
+io.on("connection", (socket) => {
+  console.log(`A user connected: ${socket.id}`);
 });
 });
 
@@ -258,6 +276,9 @@ app.post('/webtech', async (req, res) => {
     console.log(e)
   }
 })
+
+
+
 
 // Analyez website status
 app.post('/webstatus', [auth.verify], async (req, res) => {
