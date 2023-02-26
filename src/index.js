@@ -13,14 +13,41 @@ import fs from 'fs';
 import cors from "cors";
 import http from "http";
 import socketIO from "socket.io";
+import sleep from 'await-sleep'
+const socektConnection = []
+
+
+
 
 const app = express()
-const port = 3000
+const options ={
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  },
+  
+  
+}
 app.use(cors())
 app.use(bodyParser.json())
+const httpServer = require("http").Server(app);
+const port = 3000
+const io = require("socket.io")(httpServer, options);
 
-const server = http.createServer(app);
-const io = socketIO(server);
+
+
+io.on("connection", (socket) => {
+  socektConnection[socket.id]=true
+  socket.on("disconnect", (reason) => {
+    socektConnection[socket.id]=false
+  }); 
+
+});
+
+
+
+
+
 
 app.get('/', (req, res) => {
   res.send("Site is under construction")
@@ -115,6 +142,7 @@ res.json(lista);
 
 app.post('/dir', async (req, res) => {
   let domain = req.body;
+  let SocketClientId = req.header("X-Socketio-Id")
   var array = fs.readFileSync('assets/dir.txt', 'utf8').replace(/\r\n/g,'\n').split('\n');
 
 res.writeHead(200, {
@@ -122,25 +150,27 @@ res.writeHead(200, {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "*"
 });
-array.forEach((item, index) => {
-  setTimeout(async() => {
+for(let i=0; i < array.length; i++){
       try {
-          const { status } = await axios.get(domain.dns+"/"+item);
+        if(array[i] == "SVRTLUVORC1PRi1TQ0FOLUFORC1JVC1XSUxMLVNUT1A="){
+          io.emit("data", { item:array[i]} );
+          console.log("End of Dir Scaning!")
+          break
+      }
+          const { status } = await axios.get(domain.dns+"/"+array[i]);
           if (status === 200) {
-              io.emit("data", { item, status });
+              io.emit("data", { item:array[i], status });
 
+}
+          if(!socektConnection[SocketClientId]){
+            break
           }
       } catch (error) {
-          console.error(`Error Occured: ${error}`, item);
-          io.emit(`Error Occured: ${error}`, item);
+          console.error(`Error Occured: ${error}`, array[i]);
 
       }
-  }, 500 * index);
-});
-
-io.on("connection", (socket) => {
-  console.log(`A user connected: ${socket.id}`);
-});
+      await sleep(50);
+}
 });
 
 
@@ -201,7 +231,7 @@ app.get('/my-ip', async (req, res) => {
 
 //DNS LOOK UP
 
-app.post('/dnslookup',   (req, res) => {
+app.post('/dnslookup', (req, res) => {
   let DNS = req.body
   let stringdns = JSON.stringify(DNS.DNS).replace(/"/g, "");
   console.log(stringdns)
@@ -319,4 +349,4 @@ app.post('/webstatus', [auth.verify], async (req, res) => {
 })
 
 
-app.listen(port, () => console.log(`Port ${port}`))
+httpServer.listen(port, () => console.log(`Port ${port}`))
