@@ -13,7 +13,8 @@ import fs from 'fs';
 import cors from "cors";
 import http from "http";
 import socketIO from "socket.io";
-import sleep from 'await-sleep'
+import sleep from 'await-sleep';
+import * as https from "https";
 const socektConnection = []
 
 
@@ -140,26 +141,32 @@ res.json(lista);
 
 //dir
 
-app.post('/dir', async (req, res) => {
+app.post('/dir', [auth.verify], async (req, res) => {
   let domain = req.body;
+  let myemail = req.jwt.email;
   let SocketClientId = req.header("X-Socketio-Id")
-  var array = fs.readFileSync('assets/dir.txt', 'utf8').replace(/\r\n/g,'\n').split('\n');
+  var array = fs.readFileSync('assets/smaldir.txt', 'utf8').replace(/\r\n/g,'\n').split('\n');
 
 res.writeHead(200, {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "*"
 });
+console.log(myemail);
 for(let i=0; i < array.length; i++){
       try {
         if(array[i] == "SVRTLUVORC1PRi1TQ0FOLUFORC1JVC1XSUxMLVNUT1A="){
-          io.emit("data", { item:array[i]} );
+          io.emit(myemail, { item:array[i]} );
           console.log("End of Dir Scaning!")
           break
       }
-          const { status } = await axios.get(domain.dns+"/"+array[i]);
+          const { status } = await axios.get(domain.dns+"/"+array[i],{
+            httpsAgent: new https.Agent({
+              rejectUnauthorized: false
+            })
+          });
           if (status === 200) {
-              io.emit("data", { item:array[i], status });
+              io.emit(myemail, { item:array[i], status});
 
 }
           if(!socektConnection[SocketClientId]){
@@ -169,7 +176,8 @@ for(let i=0; i < array.length; i++){
           console.error(`Error Occured: ${error}`, array[i]);
 
       }
-      await sleep(50);
+      io.emit(myemail+"interaction",{numberofinteraction:i});
+      await sleep(20);
 }
 });
 
