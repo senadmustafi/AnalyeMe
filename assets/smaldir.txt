@@ -47,6 +47,10 @@ aa
 aaa
 abc
 about
+.git/
+wp-includes
+wp-admin
+robots.txt
 academic
 access
 accessgranted
@@ -553,6 +557,7 @@ msql
 mssql
 music
 my
+media
 my-sql
 mysql
 names
