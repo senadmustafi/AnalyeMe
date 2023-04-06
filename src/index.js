@@ -21,15 +21,15 @@ const socektConnection = []
 
 
 const app = express()
-const options ={
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  },
-  
-  
-}
-app.use(cors())
+//const options ={
+//  cors: {
+//    origin: "*",
+//    methods: ["GET", "POST"]
+// },
+//}
+
+
+//app.use(cors())
 app.use(bodyParser.json())
 const httpServer = require("http").Server(app);
 const port = 3000
