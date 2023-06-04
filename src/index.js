@@ -191,8 +191,6 @@ app.get('/history/webstatus', [auth.verify], async (req, res) => {
     let curArray = await cur.toArray()
     const filteredArray = curArray.filter(obj => obj.your_email === req.jwt.email)
     return res.json(filteredArray)
-
-
   }
   catch (e) {
     console.log(e);
@@ -327,7 +325,7 @@ app.post('/webstatus', [auth.verify], async (req, res) => {
 
   // Make request
   try {
-    const shodan_get_data = await axios.get(`https://api.shodan.io/shodan/host/${ip}?key=` + process.env.SHODAN_KEY);
+    const shodan_get_data = await axios.get(`https://internetdb.shodan.io/${ip}`);
     let shodan_data = (shodan_get_data.data)
 
 
